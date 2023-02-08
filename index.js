@@ -89,13 +89,22 @@ class ScreenshotDiff{
         await this.puppeteer_browser_close()
         this.log('Browser closed')
         const fileName = this.getFileName(this.url_1)
-        const result = pixelmatch(image_1.data, image_2.data, diff.data, width, height, { threshold: 0.7, includeAA: true });
+        pixelmatch(image_1.data, image_2.data, diff.data, width, height, { threshold: 0.7, includeAA: true });
         fs.writeFileSync(__dirname + `/screenshots/diff/${fileName}`, PNG.sync.write(diff));
     }
 }
 
+const helper = () => {
+    const localhost = 'http://localhost:5173/'
+    const production = 'https://www.builder.io/'
+    const pathnames = [
+        'c/docs/how-builder-works',
+        'c/docs/developers',
+        'c/docs/intro',
+    ]
+    pathnames.forEach((pathname) => {
+        new ScreenshotDiff(localhost+pathname, production+pathname).result()
+    })
+}
 
-const url_1 = "http://localhost:5173/c/docs/how-builder-works"
-const url_2 = "https://www.builder.io/c/docs/how-builder-works"
-const SD = new ScreenshotDiff(url_1, url_2, true)
-SD.result()
+helper()
