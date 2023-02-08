@@ -8,7 +8,7 @@ const puppeteer = require("puppeteer");
 const pixelmatch = require('pixelmatch');
 const fs = require('fs');
 const PNG = require('pngjs').PNG
-const path = require("path");
+
 class ScreenshotDiff{
     constructor(url_1, url_2, debug = false){
         this.url_1 = url_1
@@ -20,6 +20,21 @@ class ScreenshotDiff{
               width: 1294,
               height: 1280,
             },
+        }
+        const localhostScreenshots = __dirname + '/screenshots/localhost';
+        const productionScreenshots = __dirname + '/screenshots/production';
+        const diffScreenshots = __dirname + '/screenshots/diff';
+        if (!fs.existsSync(localhostScreenshots)){
+            fs.mkdirSync(localhostScreenshots, { recursive: true });
+            this.log("Created folder for localhost ss")
+        }
+        if (!fs.existsSync(productionScreenshots)){
+            fs.mkdirSync(productionScreenshots, { recursive: true });
+            this.log("Created folder for production ss")
+        }
+        if (!fs.existsSync(diffScreenshots)){
+            fs.mkdirSync(diffScreenshots, { recursive: true });
+            this.log("Created folder for diff ss")
         }
     }
     log(text){
