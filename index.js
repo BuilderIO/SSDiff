@@ -10,29 +10,35 @@ const fs = require('fs');
 const PNG = require('pngjs').PNG
 const Links = require('./links.json');
 const { URL } = require("url");
-const { isArray } = require("util");
 
 class ScreenshotDiff{
-    constructor(url_1, url_2, browserConfig, debug = false, browser=null, close_browser_after_result = false){
+    constructor(url_1, url_2, pathnames ,browserConfig, debug = false){
         this.url_1 = url_1
         this.url_2 = url_2
-        this.browser = browser
+        this.pathnames = pathnames
+        this.browser = null
         this.debug = debug
-        this.close_browser_after_result = close_browser_after_result
         this.browserConfig = browserConfig
-        const localhostScreenshots = __dirname + '/screenshots/localhost';
-        const productionScreenshots = __dirname + '/screenshots/production';
-        const diffScreenshots = __dirname + '/screenshots/diff';
-        if (!fs.existsSync(localhostScreenshots)){
-            fs.mkdirSync(localhostScreenshots, { recursive: true });
+        // TODO: make the file naming dynamic based on hostnames
+        this.screenshotsFolder = __dirname + '/screenshots'
+        this.localhostScreenshots = this.screenshotsFolder + '/localhost';
+        this.productionScreenshots =this.screenshotsFolder + '/production';
+        this.diffScreenshots = this.screenshotsFolder + '/diff';
+
+        if(!fs.existsSync(this.screenshotsFolder)){
+            fs.mkdirSync(this.screenshotsFolder, { recursive: true });
+            this.log("Created screenshot dir")
+        }
+        if (!fs.existsSync(this.localhostScreenshots)){
+            fs.mkdirSync(this.localhostScreenshots, { recursive: true });
             this.log("Created folder for localhost ss")
         }
-        if (!fs.existsSync(productionScreenshots)){
-            fs.mkdirSync(productionScreenshots, { recursive: true });
+        if (!fs.existsSync(this.productionScreenshots)){
+            fs.mkdirSync(this.productionScreenshots, { recursive: true });
             this.log("Created folder for production ss")
         }
-        if (!fs.existsSync(diffScreenshots)){
-            fs.mkdirSync(diffScreenshots, { recursive: true });
+        if (!fs.existsSync(this.diffScreenshots)){
+            fs.mkdirSync(this.diffScreenshots, { recursive: true });
             this.log("Created folder for diff ss")
         }
     }
@@ -57,10 +63,13 @@ class ScreenshotDiff{
         const parsedURL = new URL(url)
         return parsedURL.pathname.split('/')[3]
     }
-    async screenshot(url){
-       const parsedURL = new URL(url)
-       await this.puppeteer_browser_open()
-       this.log('Browser opened')
+    getFileLocation(url, fileName){
+        const parsedURL = new URL(url)
+        // TODO: make this dynamic based on site name as config
+        const filePath = (parsedURL.hostname.indexOf('localhost') !== -1 || parsedURL.hostname.indexOf('site-qwik') !== -1) ? this.localhostScreenshots : this.productionScreenshots
+        return filePath + '/' + fileName
+    }
+    async screenshot(url, fileName){
        const page = await this.browser.newPage();
        this.log('New Page in browser opened')
        console.log(url)
@@ -70,35 +79,42 @@ class ScreenshotDiff{
        })
        this.log('URL opened on page')
        // fileLocation ->  localhost_developers
-       const filePath = __dirname + '/screenshots/' 
-       const domain = (parsedURL.hostname.indexOf('localhost') !== -1 || parsedURL.hostname.indexOf('site-qwik') !== -1 ? 'localhost' : 'production') + '/'
-       const fileName = this.getFileName(url)
-       const fileLocation = filePath + domain + fileName
+       const fileLocation = this.getFileLocation(url, fileName)
        await page.screenshot({path : fileLocation,type:"png"})
        this.log(`SS of the page saved at ${fileLocation}`)
        await page.close()
        this.log('Page closed')
        return fileLocation
     }
-    
-    async result(){
-        const image_1 = PNG.sync.read(fs.readFileSync(await this.screenshot(this.url_1)));
-        const image_2 = PNG.sync.read(fs.readFileSync(await this.screenshot(this.url_2)));
-        console.log(image_1.height, image_2.height)
+    async compare(compareObj){
+        const {url_1, url_2, fileName} = compareObj
+        const screenshots = await Promise.all([this.screenshot(url_1, fileName), this.screenshot(url_2, fileName)])
+        const image_1 = PNG.sync.read(fs.readFileSync(screenshots[0]));
+        const image_2 = PNG.sync.read(fs.readFileSync(screenshots[1]));
         const {height, width} = image_1
         const diff = new PNG({ width, height });
-        if(this.close_browser_after_result){
-            await this.puppeteer_browser_close()
-            this.log('Browser closed')
-        }
-        const fileName = this.getFileName(this.url_1)
         pixelmatch(image_1.data, image_2.data, diff.data, width, height, { threshold: 0.7, includeAA: true });
         fs.writeFileSync(__dirname + `/screenshots/diff/${fileName}`, PNG.sync.write(diff));
     }
+    async result(){
+        await this.puppeteer_browser_open()
+        this.log('Browser opened')
+        const urls = this.pathnames.map((pathname) => {
+            return {
+                url_1 : this.url_1 + pathname,
+                url_2 : this.url_2 + pathname,
+                fileName : this.getFileName(this.url_1+pathname) 
+            }
+        })
+        const promises = urls.map((compareObj) => this.compare(compareObj))
+        await Promise.all(promises)
+        await this.puppeteer_browser_close()
+        this.log('Browser closed')
+    }
 }
 
-// const localhost = 'http://site-qwik.vercel.app'
-const localhost = 'http://localhost:5173'
+const localhost = 'http://site-qwik.vercel.app'
+// const localhost = 'http://localhost:5173'
 const production = 'https://www.builder.io'
 
 const getLinks = (links, result) => {
@@ -118,18 +134,15 @@ const getLinks = (links, result) => {
 }
 
 const helper = async () => {
-    const pathnames = getLinks(Links, []).slice(0, 10)
-    console.log(pathnames)
+    const pathnames = getLinks(Links, []).slice(0, 5)
     const browserConfig = {
         defaultViewport: {
           width: 1294,
           height: 1280,
         },
     }
-    const browser = await puppeteer.launch(browserConfig)
-    pathnames.forEach((pathname) => {
-        new ScreenshotDiff(localhost+pathname, production+pathname, browserConfig, true, browser, false).result()
-    })
+    const ssDiff = new ScreenshotDiff(localhost, production, pathnames, browserConfig, true)
+    await ssDiff.result()
 }
 
 helper()  
