@@ -21,21 +21,11 @@ class ScreenshotDiff{
         this.browserConfig = browserConfig
         // TODO: make the file naming dynamic based on hostnames
         this.screenshotsFolder = __dirname + '/screenshots'
-        this.localhostScreenshots = this.screenshotsFolder + '/localhost';
-        this.productionScreenshots =this.screenshotsFolder + '/production';
         this.diffScreenshots = this.screenshotsFolder + '/diff';
 
         if(!fs.existsSync(this.screenshotsFolder)){
             fs.mkdirSync(this.screenshotsFolder, { recursive: true });
             this.log("Created screenshot dir")
-        }
-        if (!fs.existsSync(this.localhostScreenshots)){
-            fs.mkdirSync(this.localhostScreenshots, { recursive: true });
-            this.log("Created folder for localhost ss")
-        }
-        if (!fs.existsSync(this.productionScreenshots)){
-            fs.mkdirSync(this.productionScreenshots, { recursive: true });
-            this.log("Created folder for production ss")
         }
         if (!fs.existsSync(this.diffScreenshots)){
             fs.mkdirSync(this.diffScreenshots, { recursive: true });
@@ -63,34 +53,25 @@ class ScreenshotDiff{
         const parsedURL = new URL(url)
         return parsedURL.pathname.split('/')[3]
     }
-    getFileLocation(url, fileName){
-        const parsedURL = new URL(url)
-        // TODO: make this dynamic based on site name as config
-        const filePath = (parsedURL.hostname.indexOf('localhost') !== -1 || parsedURL.hostname.indexOf('site-qwik') !== -1) ? this.localhostScreenshots : this.productionScreenshots
-        return filePath + '/' + fileName
-    }
-    async screenshot(url, fileName){
+    async screenshot(url){
        const page = await this.browser.newPage();
        this.log('New Page in browser opened')
-       console.log(url)
        await page.goto(url, {
             waitUntil:"networkidle0",
             timeout : 0
        })
-       this.log('URL opened on page')
+       this.log('URL opened on page ', url)
        // fileLocation ->  localhost_developers
-       const fileLocation = this.getFileLocation(url, fileName)
-       await page.screenshot({path : fileLocation,type:"png"})
-       this.log(`SS of the page saved at ${fileLocation}`)
+       const screenshot = await page.screenshot({type:"png"})
        await page.close()
        this.log('Page closed')
-       return fileLocation
+       return screenshot
     }
     async compare(compareObj){
         const {url_1, url_2, fileName} = compareObj
-        const screenshots = await Promise.all([this.screenshot(url_1, fileName), this.screenshot(url_2, fileName)])
-        const image_1 = PNG.sync.read(fs.readFileSync(screenshots[0]));
-        const image_2 = PNG.sync.read(fs.readFileSync(screenshots[1]));
+        const screenshots = await Promise.all([this.screenshot(url_1), this.screenshot(url_2)])
+        const image_1 = PNG.sync.read(screenshots[0]);
+        const image_2 = PNG.sync.read(screenshots[1]);
         const {height, width} = image_1
         const diff = new PNG({ width, height });
         pixelmatch(image_1.data, image_2.data, diff.data, width, height, { threshold: 0.7, includeAA: true });
@@ -134,14 +115,14 @@ const getLinks = (links, result) => {
 }
 
 const helper = async () => {
-    const pathnames = getLinks(Links, []).slice(0, 5)
+    const pathnames = getLinks(Links, []).slice(0,5)
     const browserConfig = {
         defaultViewport: {
           width: 1294,
           height: 1280,
         },
     }
-    const ssDiff = new ScreenshotDiff(localhost, production, pathnames, browserConfig, true)
+    const ssDiff = new ScreenshotDiff(localhost, production, pathnames, browserConfig, false)
     await ssDiff.result()
 }
 
