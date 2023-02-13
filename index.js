@@ -21,15 +21,12 @@ class ScreenshotDiff{
         this.browserConfig = browserConfig
         // TODO: make the file naming dynamic based on hostnames
         this.screenshotsFolder = __dirname + '/screenshots'
-        this.diffScreenshots = this.screenshotsFolder + '/diff';
-
-        if(!fs.existsSync(this.screenshotsFolder)){
-            fs.mkdirSync(this.screenshotsFolder, { recursive: true });
-            this.log("Created screenshot dir")
-        }
-        if (!fs.existsSync(this.diffScreenshots)){
-            fs.mkdirSync(this.diffScreenshots, { recursive: true });
-            this.log("Created folder for diff ss")
+        const todaysDate = new Date().toISOString().split('T')[0]
+        this.todaysScreenshotFolder = this.screenshotsFolder + '/' + todaysDate
+        this.diffScreenshots = this.todaysScreenshotFolder + '/diff';
+        if(!fs.existsSync(this.diffScreenshots)){
+            fs.mkdirSync(this.diffScreenshots, { recursive: true })
+            this.log("Created diff folder for todays ss")
         }
     }
     log(text){
@@ -75,7 +72,7 @@ class ScreenshotDiff{
         const {height, width} = image_1
         const diff = new PNG({ width, height });
         pixelmatch(image_1.data, image_2.data, diff.data, width, height, { threshold: 0.7, includeAA: true });
-        fs.writeFileSync(__dirname + `/screenshots/diff/${fileName}`, PNG.sync.write(diff));
+        fs.writeFileSync(this.diffScreenshots + `/${fileName}`, PNG.sync.write(diff));
     }
     async result(){
         await this.puppeteer_browser_open()
@@ -103,19 +100,22 @@ const getLinks = (links, result) => {
         if(link.subLinks){
             getLinks(link.subLinks, result)
         }else{
-            try{
-                const url = new URL(link.link)
-                result.push(url.pathname)
-            }catch(e){
-                result.push(link.link)
-            }
+            // only take the links that are in the docs
+            if(link.link.indexOf('/c/docs') !== -1){
+                try{
+                    const url = new URL(link.link)
+                    result.push(url.pathname)
+                }catch(e){
+                    result.push(link.link)
+                }
+            }   
         }
     })
     return result
 }
 
 const helper = async () => {
-    const pathnames = getLinks(Links, []).slice(0,5)
+    const pathnames = getLinks(Links, []).slice(0,20)
     const browserConfig = {
         defaultViewport: {
           width: 1294,
