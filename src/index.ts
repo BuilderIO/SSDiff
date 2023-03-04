@@ -1,9 +1,3 @@
-// go to the webiste1 take ss
-// go to website2 take ss
-// match the ss with pixel match and sho the difference 
-// ISSUES : 
-// page size needs to be same
-// Position of pixels
 import puppeteer from "puppeteer";
 import pixelmatch from 'pixelmatch';
 import fs from 'fs';
@@ -11,24 +5,52 @@ import { PNG } from 'pngjs';
 // import Links from '../links.json';
 import { URL } from "url";
 
+interface BrowserConfig {
+    defaultViewport: { width: number; height: number; };
+}
+interface ScreenshotConfig {
+    type: 'png' | 'jpeg' | 'webp';
+    fullPage?: boolean;
+}
+interface ScreenshotDiffConfig {
+    url_1: string;
+    url_2: string;
+    pathnames: string[];
+    browserConfig?: BrowserConfig
+    screenshotConfig?: ScreenshotConfig
+    debug?: boolean;
+}
+
 class ScreenshotDiff{
     url_1: any;
     url_2: any;
     pathnames: any;
     browser: any;
     debug: boolean;
-    browserConfig: any;
+    browserConfig: BrowserConfig;
+    screenshotConfig: ScreenshotConfig;
     screenshotsFolder: string;
     todaysScreenshotFolder: string;
     diffScreenshots: string;
     
-    constructor(url_1: string, url_2: string, pathnames: string[] ,browserConfig: { defaultViewport: { width: number; height: number; }; }, debug = false){
-        this.url_1 = url_1
-        this.url_2 = url_2
-        this.pathnames = pathnames
+    constructor(config : ScreenshotDiffConfig){
+        const defaultScreenshotConfig: ScreenshotConfig = {
+            type : 'png'
+        }
+        const defaultBrowserConfig: BrowserConfig = {
+            defaultViewport: {
+                width: 1294,
+                height: 1280,
+            }
+        }
+        const defaultDebugOption = false
+        this.url_1 = config.url_1
+        this.url_2 = config.url_2
+        this.pathnames = config.pathnames
+        this.debug = config.debug ?? defaultDebugOption
+        this.browserConfig = config.browserConfig ?? defaultBrowserConfig
+        this.screenshotConfig = config.screenshotConfig ?? defaultScreenshotConfig
         this.browser = null
-        this.debug = debug
-        this.browserConfig = browserConfig
         // TODO: make the file naming dynamic based on hostnames
         this.screenshotsFolder = process.cwd() + '/screenshots'
         const todaysDate = new Date().toISOString().split('T')[0]
@@ -69,7 +91,7 @@ class ScreenshotDiff{
        })
        this.log(`URL opened on page ${url}`)
        // fileLocation ->  localhost_developers
-       const screenshot = await page.screenshot({type:"png"})
+       const screenshot = await page.screenshot(this.screenshotConfig)
        await page.close()
        this.log('Page closed')
        return screenshot
@@ -127,13 +149,14 @@ const getLinks = (links: any[], result: string[]) => {
 const helper = async () => {
     // const pathnames = getLinks(Links, []).slice(140,165)
     const pathnames = ['/c/docs/quickstart', '/c/docs/models-intro', '/c/docs/enterprise-hub']
-    const browserConfig = {
-        defaultViewport: {
-          width: 1294,
-          height: 1280,
-        },
+   
+    const config = {
+        url_1: localhost,
+        url_2: production,
+        pathnames,
+        debug: true
     }
-    const ssDiff = new ScreenshotDiff(localhost, production, pathnames, browserConfig, false)
+    const ssDiff = new ScreenshotDiff(config)
     await ssDiff.result()
 }
 
