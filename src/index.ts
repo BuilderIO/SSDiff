@@ -142,4 +142,3 @@ export class SSDiff {
     return resultMap;
   }
 }
-
