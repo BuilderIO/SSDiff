@@ -32,7 +32,8 @@ class ScreenshotDiff{
     screenshotsFolder: string;
     todaysScreenshotFolder: string;
     diffScreenshots: string;
-    
+    fileNameDifferenceMap : Map<string, number> = new Map()
+
     constructor(config : ScreenshotDiffConfig){
         const defaultScreenshotConfig: ScreenshotConfig = {
             type : 'png'
@@ -99,12 +100,23 @@ class ScreenshotDiff{
     async compare(compareObj: { url_1: any; url_2: any; fileName: any; }){
         const {url_1, url_2, fileName} = compareObj
         const screenshots = await Promise.all([this.screenshot(url_1), this.screenshot(url_2)])
+        // TODO: Make the file name dynamic based on the fileType in screenshotConfig
         const image_1 = PNG.sync.read(screenshots[0]);
         const image_2 = PNG.sync.read(screenshots[1]);
         const {height, width} = image_1
         const diff = new PNG({ width, height });
-        pixelmatch(image_1.data, image_2.data, diff.data, width, height, { threshold: 0.7, includeAA: true });
+
+        // Sort the files based on the most different, based on the number of pixels and total pixels
+        const numDiffPixels = pixelmatch(image_1.data, image_2.data, diff.data, width, height, { threshold: 0.7, includeAA: true });
+        const totalPixels = image_1.data.length / 4
+        const differencePercentage = (numDiffPixels/totalPixels) * 100
+        this.log(`file name: ${fileName} | numDiffPixels: ${numDiffPixels} | height: ${height} | width: ${width} | totalPixels: ${totalPixels} | percentage: ${(numDiffPixels/totalPixels) * 100}}`)
+        this.fileNameDifferenceMap.set(fileName, differencePercentage) // this map is used to sort the files in the folde
         fs.writeFileSync(this.diffScreenshots + `/${fileName}`, PNG.sync.write(diff));
+    }
+    async sortFilesBasedOnDifference(){
+        const sortedMap = new Map([...this.fileNameDifferenceMap.entries()].sort((a, b) => b[1] - a[1]))
+        return sortedMap
     }
     async result(){
         await this.puppeteer_browser_open()
@@ -119,7 +131,9 @@ class ScreenshotDiff{
         const promises = urls.map((compareObj: any) => this.compare(compareObj))
         await Promise.all(promises)
         await this.puppeteer_browser_close()
+        const resultMap = await this.sortFilesBasedOnDifference()
         this.log('Browser closed')
+        return resultMap
     }
 }
 
@@ -148,16 +162,16 @@ const getLinks = (links: any[], result: string[]) => {
 
 const helper = async () => {
     // const pathnames = getLinks(Links, []).slice(140,165)
-    const pathnames = ['/c/docs/quickstart', '/c/docs/models-intro', '/c/docs/enterprise-hub']
+    const pathnames = ['/c/docs/quickstart', '/c/docs/models-intro', '/c/docs/enterprise-hub', '/c/docs/getting-started']
    
     const config = {
         url_1: localhost,
         url_2: production,
         pathnames,
-        debug: true
     }
     const ssDiff = new ScreenshotDiff(config)
-    await ssDiff.result()
+    const result = await ssDiff.result()
+    console.log(result)
 }
 
 helper()  
