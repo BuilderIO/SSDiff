@@ -20,7 +20,7 @@ export interface SSDiffConfig {
   debug?: boolean;
 }
 
-class SSDiff {
+export class SSDiff {
   url1: any;
   url2: any;
   pathnames: any;
@@ -143,4 +143,3 @@ class SSDiff {
   }
 }
 
-export default SSDiff;
