@@ -39,12 +39,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// go to the webiste1 take ss
-// go to website2 take ss
-// match the ss with pixel match and sho the difference 
-// ISSUES : 
-// page size needs to be same
-// Position of pixels
 var puppeteer_1 = __importDefault(require("puppeteer"));
 var pixelmatch_1 = __importDefault(require("pixelmatch"));
 var fs_1 = __importDefault(require("fs"));
@@ -52,16 +46,27 @@ var pngjs_1 = require("pngjs");
 // import Links from '../links.json';
 var url_3 = require("url");
 var ScreenshotDiff = /** @class */ (function () {
-    function ScreenshotDiff(url_1, url_2, pathnames, browserConfig, debug) {
-        if (debug === void 0) { debug = false; }
-        this.url_1 = url_1;
-        this.url_2 = url_2;
-        this.pathnames = pathnames;
+    function ScreenshotDiff(config) {
+        var _a, _b, _c;
+        var defaultScreenshotConfig = {
+            type: 'png'
+        };
+        var defaultBrowserConfig = {
+            defaultViewport: {
+                width: 1294,
+                height: 1280,
+            }
+        };
+        var defaultDebugOption = false;
+        this.url_1 = config.url_1;
+        this.url_2 = config.url_2;
+        this.pathnames = config.pathnames;
+        this.debug = (_a = config.debug) !== null && _a !== void 0 ? _a : defaultDebugOption;
+        this.browserConfig = (_b = config.browserConfig) !== null && _b !== void 0 ? _b : defaultBrowserConfig;
+        this.screenshotConfig = (_c = config.screenshotConfig) !== null && _c !== void 0 ? _c : defaultScreenshotConfig;
         this.browser = null;
-        this.debug = debug;
-        this.browserConfig = browserConfig;
         // TODO: make the file naming dynamic based on hostnames
-        this.screenshotsFolder = __dirname + '/screenshots';
+        this.screenshotsFolder = process.cwd() + '/screenshots';
         var todaysDate = new Date().toISOString().split('T')[0];
         this.todaysScreenshotFolder = this.screenshotsFolder + '/' + todaysDate;
         this.diffScreenshots = this.todaysScreenshotFolder + '/diff';
@@ -131,7 +136,7 @@ var ScreenshotDiff = /** @class */ (function () {
                     case 2:
                         _a.sent();
                         this.log("URL opened on page ".concat(url));
-                        return [4 /*yield*/, page.screenshot({ type: "png" })];
+                        return [4 /*yield*/, page.screenshot(this.screenshotConfig)];
                     case 3:
                         screenshot = _a.sent();
                         return [4 /*yield*/, page.close()];
@@ -220,18 +225,18 @@ var getLinks = function (links, result) {
     return result;
 };
 var helper = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var pathnames, browserConfig, ssDiff;
+    var pathnames, config, ssDiff;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 pathnames = ['/c/docs/quickstart', '/c/docs/models-intro', '/c/docs/enterprise-hub'];
-                browserConfig = {
-                    defaultViewport: {
-                        width: 1294,
-                        height: 1280,
-                    },
+                config = {
+                    url_1: localhost,
+                    url_2: production,
+                    pathnames: pathnames,
+                    debug: true
                 };
-                ssDiff = new ScreenshotDiff(localhost, production, pathnames, browserConfig, false);
+                ssDiff = new ScreenshotDiff(config);
                 return [4 /*yield*/, ssDiff.result()];
             case 1:
                 _a.sent();
