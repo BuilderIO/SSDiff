@@ -11,7 +11,7 @@ export interface ScreenshotConfig {
     type: 'png' | 'jpeg' | 'webp';
     fullPage?: boolean;
 }
-export interface ScreenshotDiffConfig {
+export interface SSDiffConfig {
     url_1: string;
     url_2: string;
     pathnames: string[];
@@ -20,7 +20,7 @@ export interface ScreenshotDiffConfig {
     debug?: boolean;
 }
 
-class ScreenshotDiff{
+class SSDiff{
     url_1: any;
     url_2: any;
     pathnames: any;
@@ -33,7 +33,7 @@ class ScreenshotDiff{
     diffScreenshots: string;
     fileNameDifferenceMap : Map<string, number> = new Map()
 
-    constructor(config : ScreenshotDiffConfig){
+    constructor(config : SSDiffConfig){
         const defaultScreenshotConfig: ScreenshotConfig = {
             type : 'png'
         }
@@ -137,4 +137,4 @@ class ScreenshotDiff{
 }
 
 
-export default ScreenshotDiff
+export default SSDiff
