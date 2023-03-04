@@ -10,8 +10,9 @@
     "start": "node dist/index.js",
     "dev": "nodemon --watch src --exec \"ts-node\" src/index.ts",
     "prepare": "npm run build",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
-    "lint": "tslint -p tsconfig.json"
+    "format": "prettier --write 'src/**/*{.ts,.tsx}'",
+    "lint": "tslint -p tsconfig.json",
+    "lint:fix": "tslint --fix -c tslint.json 'src/**/*{.ts,.tsx}'"
   },
   "files": [
     "dist/**/*"
