@@ -32,6 +32,7 @@ const helper = async () => {
        url2: production,
        pathnames,
        debug : true,
+       outputFile: true
     })
 
     const result = await ssDiff.result()
