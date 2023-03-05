@@ -1,6 +1,0 @@
-[2023-03-05T11:50:44.693] [INFO] ssdiffOutput - Map(4) {
-  'getting-started' => 15.1953125,
-  'quickstart' => 1.290330370942813,
-  'models-intro' => 0.9346020092735703,
-  'enterprise-hub' => 0.002837615919629057
-}

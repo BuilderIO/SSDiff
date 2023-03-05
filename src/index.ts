@@ -83,34 +83,50 @@ export class SSDiff {
     }
   }
   async puppeteer_browser_open() {
-    if (!this.browser) {
-      this.browser = await puppeteer.launch(this.browserConfig);
+    try{
+      if (!this.browser) {
+        this.browser = await puppeteer.launch(this.browserConfig);
+      }
+    }catch(e:any){
+      throw new Error('Error while opening browser: ' + e.message)
     }
   }
   async puppeteer_browser_close() {
-    if (this.browser) {
-      await this.browser.close();
-      // setting this as null so we dont get closed instance the next time
-      this.browser = null;
+    try{
+      if (this.browser) {
+        await this.browser.close();
+        // setting this as null so we dont get closed instance the next time
+        this.browser = null;
+      }
+    }catch(e:any){
+      throw new Error('Error while closing browser: ' + e.message)
     }
   }
   getFileName(url: string) {
-    const parsedURL = new URL(url);
-    return parsedURL.pathname.split('/')[3];
+    try{
+      const parsedURL = new URL(url);
+      return parsedURL.pathname.split('/')[3];
+    }catch(e:any){
+      throw new Error('Error while getting file name: ' + e.message)
+    }
   }
   async screenshot(url: any) {
-    const page = await this.browser.newPage();
-    this.log('New Page in browser opened');
-    await page.goto(url, {
-      waitUntil: 'networkidle0',
-      timeout: 0,
-    });
-    this.log(`URL opened on page ${url}`);
-    // fileLocation ->  localhost_developers
-    const screenshot = await page.screenshot(this.screenshotConfig);
-    await page.close();
-    this.log('Page closed');
-    return screenshot;
+    try{
+      const page = await this.browser.newPage();
+      this.log('New Page in browser opened');
+      await page.goto(url, {
+        waitUntil: 'networkidle0',
+        timeout: 0,
+      });
+      this.log(`URL opened on page ${url}`);
+      // fileLocation ->  localhost_developers
+      const screenshot = await page.screenshot(this.screenshotConfig);
+      await page.close();
+      this.log('Page closed');
+      return screenshot;
+    }catch(e:any){
+      throw new Error('Error while taking screenshot: ' + e.message)
+    }
   }
   /**
    * Returns the pixel difference number for two images and creates a difference image
@@ -124,28 +140,32 @@ export class SSDiff {
    * @returns Pixel difference number for two images and creates a difference image
    */
   async compare(compareObj: { url1: any; url2: any; fileName: any }) {
-    const { url1, url2, fileName } = compareObj;
-    const screenshots = await Promise.all([this.screenshot(url1), this.screenshot(url2)]);
-    // TODO: Make the file name dynamic based on the fileType in screenshotConfig
-    const image1 = PNG.sync.read(screenshots[0]);
-    const image2 = PNG.sync.read(screenshots[1]);
-    const { height, width } = image1;
-    const diff = new PNG({ width, height });
-
-    // Sort the files based on the most different, based on the number of pixels and total pixels
-    const numDiffPixels = pixelmatch(image1.data, image2.data, diff.data, width, height, {
-      threshold: 0.7,
-      includeAA: true,
-    });
-    const totalPixels = image1.data.length / 4; // suggested by co-pilot and works
-    const differencePercentage = (numDiffPixels / totalPixels) * 100;
-    this.log(
-      `file name: ${fileName} | numDiffPixels: ${numDiffPixels} | height: ${height} | width: ${width} | totalPixels: ${totalPixels} | percentage: ${
-        (numDiffPixels / totalPixels) * 100
-      }}`,
-    );
-    this.fileNameDifferenceMap.set(fileName, differencePercentage); // this map is used to sort the files in the folde
-    fs.writeFileSync(this.diffScreenshots + `/${fileName}`, PNG.sync.write(diff));
+    try{
+      const { url1, url2, fileName } = compareObj;
+      const screenshots = await Promise.all([this.screenshot(url1), this.screenshot(url2)]);
+      // TODO: Make the file name dynamic based on the fileType in screenshotConfig
+      const image1 = PNG.sync.read(screenshots[0]);
+      const image2 = PNG.sync.read(screenshots[1]);
+      const { height, width } = image1;
+      const diff = new PNG({ width, height });
+  
+      // Sort the files based on the most different, based on the number of pixels and total pixels
+      const numDiffPixels = pixelmatch(image1.data, image2.data, diff.data, width, height, {
+        threshold: 0.7,
+        includeAA: true,
+      });
+      const totalPixels = image1.data.length / 4; // suggested by co-pilot and works
+      const differencePercentage = (numDiffPixels / totalPixels) * 100;
+      this.log(
+        `file name: ${fileName} | numDiffPixels: ${numDiffPixels} | height: ${height} | width: ${width} | totalPixels: ${totalPixels} | percentage: ${
+          (numDiffPixels / totalPixels) * 100
+        }}`,
+      );
+      this.fileNameDifferenceMap.set(fileName, differencePercentage); // this map is used to sort the files in the folde
+      fs.writeFileSync(this.diffScreenshots + `/${fileName}`, PNG.sync.write(diff));
+    }catch(e:any){
+      throw new Error('Error while comparing screenshots: ' + e.message)
+    }
   }
   async sortFilesBasedOnDifference() {
     const sortedMap = new Map([...this.fileNameDifferenceMap.entries()].sort((a, b) => b[1] - a[1]));
@@ -160,23 +180,28 @@ export class SSDiff {
    * @returns Map<fileName, percentageDifference>
    */
   async result() {
-    await this.puppeteer_browser_open();
-    this.log('Browser opened');
-    const urls = this.pathnames.map((pathname: any) => {
-      return {
-        url1: this.url1 + pathname,
-        url2: this.url2 + pathname,
-        fileName: this.getFileName(this.url1 + pathname),
-      };
-    });
-    const promises = urls.map((compareObj: any) => this.compare(compareObj));
-    await Promise.all(promises);
-    await this.puppeteer_browser_close();
-    const resultMap = await this.sortFilesBasedOnDifference();
-    this.log('Browser closed');
-    // Output resultMap in output file only if configured
-    if(this.outputFile)
-      infoLogger.info(resultMap)
-    return resultMap;
+    try{
+      await this.puppeteer_browser_open();
+      this.log('Browser opened');
+      const urls = this.pathnames.map((pathname: any) => {
+        return {
+          url1: this.url1 + pathname,
+          url2: this.url2 + pathname,
+          fileName: this.getFileName(this.url1 + pathname),
+        };
+      });
+      const promises = urls.map((compareObj: any) => this.compare(compareObj));
+      await Promise.all(promises);
+      await this.puppeteer_browser_close();
+      const resultMap = await this.sortFilesBasedOnDifference();
+      this.log('Browser closed');
+      // Output resultMap in output file only if configured
+      if(this.outputFile)
+        infoLogger.info(resultMap)
+      return resultMap;
+    }catch(e:any){
+      this.log(e.message)
+      throw new Error('Error while getting result: ' + e.message)
+    }
   }
 }
