@@ -1,8 +1,23 @@
 import puppeteer from 'puppeteer';
 import pixelmatch from 'pixelmatch';
+import log4js from 'log4js';
 import fs from 'fs';
 import { PNG } from 'pngjs';
 import { URL } from 'url';
+
+log4js.configure({
+    appenders: { 
+        debug: { type: 'file', filename: 'ssdiff-debug.log' } ,
+        out: { type: 'file', filename: 'ssdiff-output.log' } 
+    },
+    categories: { 
+        default: { appenders: ['debug'], level: 'debug' }, 
+        output: { appenders: ['out'], level: 'info' } 
+    },
+})
+
+const debugLogger = log4js.getLogger();
+const infoLogger = log4js.getLogger('output');
 
 export interface BrowserConfig {
   defaultViewport: { width: number; height: number };
@@ -18,6 +33,7 @@ export interface SSDiffConfig {
   browserConfig?: BrowserConfig;
   screenshotConfig?: ScreenshotConfig;
   debug?: boolean;
+  outputFile?: boolean
 }
 
 export class SSDiff {
@@ -26,6 +42,7 @@ export class SSDiff {
   pathnames: any;
   browser: any;
   debug: boolean;
+  outputFile: boolean;
   browserConfig: BrowserConfig;
   screenshotConfig: ScreenshotConfig;
   screenshotsFolder: string;
@@ -43,11 +60,11 @@ export class SSDiff {
         height: 1280,
       },
     };
-    const defaultDebugOption = false;
     this.url1 = config.url1;
     this.url2 = config.url2;
     this.pathnames = config.pathnames;
-    this.debug = config.debug ?? defaultDebugOption;
+    this.debug = config.debug ?? false;
+    this.outputFile = config.outputFile ?? false;
     this.browserConfig = config.browserConfig ?? defaultBrowserConfig;
     this.screenshotConfig = config.screenshotConfig ?? defaultScreenshotConfig;
     this.browser = null;
@@ -63,7 +80,7 @@ export class SSDiff {
   }
   log(text: string) {
     if (this.debug) {
-      console.log(text);
+      debugLogger.debug(text)
     }
   }
   async puppeteer_browser_open() {
@@ -139,6 +156,9 @@ export class SSDiff {
     await this.puppeteer_browser_close();
     const resultMap = await this.sortFilesBasedOnDifference();
     this.log('Browser closed');
+    // Output resultMap in output file if configured
+    if(this.outputFile)
+      infoLogger.info(resultMap)
     return resultMap;
   }
 }
