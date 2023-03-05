@@ -1,0 +1,66 @@
+[2023-03-05T11:43:03.842] [DEBUG] ssdiffDebug - Browser opened
+[2023-03-05T11:43:04.999] [DEBUG] ssdiffDebug - New Page in browser opened
+[2023-03-05T11:43:05.001] [DEBUG] ssdiffDebug - New Page in browser opened
+[2023-03-05T11:43:05.003] [DEBUG] ssdiffDebug - New Page in browser opened
+[2023-03-05T11:43:05.003] [DEBUG] ssdiffDebug - New Page in browser opened
+[2023-03-05T11:43:05.005] [DEBUG] ssdiffDebug - New Page in browser opened
+[2023-03-05T11:43:05.014] [DEBUG] ssdiffDebug - New Page in browser opened
+[2023-03-05T11:43:05.014] [DEBUG] ssdiffDebug - New Page in browser opened
+[2023-03-05T11:43:05.015] [DEBUG] ssdiffDebug - New Page in browser opened
+[2023-03-05T11:43:19.518] [DEBUG] ssdiffDebug - URL opened on page http://site-qwik.vercel.app/c/docs/enterprise-hub
+[2023-03-05T11:43:19.937] [DEBUG] ssdiffDebug - URL opened on page http://site-qwik.vercel.app/c/docs/getting-started
+[2023-03-05T11:43:20.007] [DEBUG] ssdiffDebug - Page closed
+[2023-03-05T11:43:20.555] [DEBUG] ssdiffDebug - Page closed
+[2023-03-05T11:43:20.704] [DEBUG] ssdiffDebug - URL opened on page http://site-qwik.vercel.app/c/docs/models-intro
+[2023-03-05T11:43:20.979] [DEBUG] ssdiffDebug - Page closed
+[2023-03-05T11:43:21.401] [DEBUG] ssdiffDebug - URL opened on page http://site-qwik.vercel.app/c/docs/quickstart
+[2023-03-05T11:43:21.616] [DEBUG] ssdiffDebug - Page closed
+[2023-03-05T11:43:22.361] [DEBUG] ssdiffDebug - URL opened on page https://www.builder.io/c/docs/enterprise-hub
+[2023-03-05T11:43:22.361] [DEBUG] ssdiffDebug - URL opened on page https://www.builder.io/c/docs/models-intro
+[2023-03-05T11:43:22.620] [DEBUG] ssdiffDebug - Page closed
+[2023-03-05T11:43:23.082] [DEBUG] ssdiffDebug - file name: enterprise-hub | numDiffPixels: 47 | height: 1280 | width: 1294 | totalPixels: 1656320 | percentage: 0.002837615919629057}
+[2023-03-05T11:43:23.414] [DEBUG] ssdiffDebug - URL opened on page https://www.builder.io/c/docs/quickstart
+[2023-03-05T11:43:23.432] [DEBUG] ssdiffDebug - Page closed
+[2023-03-05T11:43:23.846] [DEBUG] ssdiffDebug - file name: models-intro | numDiffPixels: 15480 | height: 1280 | width: 1294 | totalPixels: 1656320 | percentage: 0.9346020092735703}
+[2023-03-05T11:43:24.201] [DEBUG] ssdiffDebug - Page closed
+[2023-03-05T11:43:24.512] [DEBUG] ssdiffDebug - file name: quickstart | numDiffPixels: 21372 | height: 1280 | width: 1294 | totalPixels: 1656320 | percentage: 1.290330370942813}
+[2023-03-05T11:43:24.811] [DEBUG] ssdiffDebug - URL opened on page https://www.builder.io/c/docs/getting-started
+[2023-03-05T11:43:25.076] [DEBUG] ssdiffDebug - Page closed
+[2023-03-05T11:43:25.293] [DEBUG] ssdiffDebug - file name: getting-started | numDiffPixels: 251683 | height: 1280 | width: 1294 | totalPixels: 1656320 | percentage: 15.1953125}
+[2023-03-05T11:43:25.940] [DEBUG] ssdiffDebug - Browser closed
+[2023-03-05T11:43:25.940] [INFO] ssdiffOutput - Map(4) {
+  'getting-started' => 15.1953125,
+  'quickstart' => 1.290330370942813,
+  'models-intro' => 0.9346020092735703,
+  'enterprise-hub' => 0.002837615919629057
+}
+[2023-03-05T11:50:21.248] [DEBUG] default - Browser opened
+[2023-03-05T11:50:22.274] [DEBUG] default - New Page in browser opened
+[2023-03-05T11:50:22.386] [DEBUG] default - New Page in browser opened
+[2023-03-05T11:50:22.388] [DEBUG] default - New Page in browser opened
+[2023-03-05T11:50:22.418] [DEBUG] default - New Page in browser opened
+[2023-03-05T11:50:22.422] [DEBUG] default - New Page in browser opened
+[2023-03-05T11:50:22.423] [DEBUG] default - New Page in browser opened
+[2023-03-05T11:50:22.433] [DEBUG] default - New Page in browser opened
+[2023-03-05T11:50:22.434] [DEBUG] default - New Page in browser opened
+[2023-03-05T11:50:35.625] [DEBUG] default - URL opened on page http://site-qwik.vercel.app/c/docs/getting-started
+[2023-03-05T11:50:36.010] [DEBUG] default - Page closed
+[2023-03-05T11:50:36.684] [DEBUG] default - URL opened on page http://site-qwik.vercel.app/c/docs/enterprise-hub
+[2023-03-05T11:50:37.139] [DEBUG] default - URL opened on page http://site-qwik.vercel.app/c/docs/models-intro
+[2023-03-05T11:50:37.154] [DEBUG] default - Page closed
+[2023-03-05T11:50:37.701] [DEBUG] default - Page closed
+[2023-03-05T11:50:39.005] [DEBUG] default - URL opened on page http://site-qwik.vercel.app/c/docs/quickstart
+[2023-03-05T11:50:39.280] [DEBUG] default - Page closed
+[2023-03-05T11:50:40.081] [DEBUG] default - URL opened on page https://www.builder.io/c/docs/models-intro
+[2023-03-05T11:50:40.341] [DEBUG] default - URL opened on page https://www.builder.io/c/docs/enterprise-hub
+[2023-03-05T11:50:40.341] [DEBUG] default - URL opened on page https://www.builder.io/c/docs/quickstart
+[2023-03-05T11:50:40.347] [DEBUG] default - Page closed
+[2023-03-05T11:50:41.167] [DEBUG] default - file name: models-intro | numDiffPixels: 15480 | height: 1280 | width: 1294 | totalPixels: 1656320 | percentage: 0.9346020092735703}
+[2023-03-05T11:50:42.088] [DEBUG] default - Page closed
+[2023-03-05T11:50:42.510] [DEBUG] default - file name: enterprise-hub | numDiffPixels: 47 | height: 1280 | width: 1294 | totalPixels: 1656320 | percentage: 0.002837615919629057}
+[2023-03-05T11:50:42.851] [DEBUG] default - Page closed
+[2023-03-05T11:50:43.293] [DEBUG] default - file name: quickstart | numDiffPixels: 21372 | height: 1280 | width: 1294 | totalPixels: 1656320 | percentage: 1.290330370942813}
+[2023-03-05T11:50:43.666] [DEBUG] default - URL opened on page https://www.builder.io/c/docs/getting-started
+[2023-03-05T11:50:43.931] [DEBUG] default - Page closed
+[2023-03-05T11:50:44.148] [DEBUG] default - file name: getting-started | numDiffPixels: 251683 | height: 1280 | width: 1294 | totalPixels: 1656320 | percentage: 15.1953125}
+[2023-03-05T11:50:44.693] [DEBUG] default - Browser closed
