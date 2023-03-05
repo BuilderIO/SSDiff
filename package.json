@@ -13,9 +13,9 @@
     "lint": "tslint -p tsconfig.json",
     "lint:fix": "tslint --fix -c tslint.json 'src/**/*{.ts,.tsx}'",
     "prepare": "npm run build",
-    "prepublishOnly" : "npm run format && npm run lint",
-    "version" : "npm run format && git add -A src",
-    "postversion" : "git push && git push --tags"
+    "prepublishOnly": "npm run format && npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "files": [
     "dist/**/*"
@@ -27,6 +27,7 @@
   "author": "Akshat Garg",
   "license": "ISC",
   "dependencies": {
+    "log4js": "^6.8.0",
     "pixelmatch": "^5.3.0",
     "pngjs": "^6.0.0",
     "puppeteer": "^19.6.3"
