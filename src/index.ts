@@ -27,13 +27,13 @@ export interface ScreenshotConfig {
   fullPage?: boolean;
 }
 export interface SSDiffConfig {
-  url1: string;
-  url2: string;
-  pathnames: string[];
-  browserConfig?: BrowserConfig;
-  screenshotConfig?: ScreenshotConfig;
-  debug?: boolean;
-  outputFile?: boolean
+  url1: string; // url of domain1
+  url2: string; // url of domain2
+  pathnames: string[]; // array of pathnames to be compared
+  browserConfig?: BrowserConfig; // config passed to puppeteer.launch
+  screenshotConfig?: ScreenshotConfig; // config passed to page.screenshot
+  debug?: boolean; // if true, debug logs will be printed
+  outputFile?: boolean // if true, output logs will be printed
 }
 
 export class SSDiff {
@@ -45,10 +45,10 @@ export class SSDiff {
   outputFile: boolean;
   browserConfig: BrowserConfig;
   screenshotConfig: ScreenshotConfig;
-  screenshotsFolder: string;
-  todaysScreenshotFolder: string;
-  diffScreenshots: string;
-  fileNameDifferenceMap: Map<string, number> = new Map();
+  screenshotsFolder: string; // screenshots folder in the root of the project
+  todaysScreenshotFolder: string; // screenshots folder for the current date
+  diffScreenshots: string; // diff screenshots folder for the current date (this still remians, because we might store ss of domains separately)
+  fileNameDifferenceMap: Map<string, number> = new Map(); // result of the comparison
 
   constructor(config: SSDiffConfig) {
     const defaultScreenshotConfig: ScreenshotConfig = {
@@ -68,7 +68,6 @@ export class SSDiff {
     this.browserConfig = config.browserConfig ?? defaultBrowserConfig;
     this.screenshotConfig = config.screenshotConfig ?? defaultScreenshotConfig;
     this.browser = null;
-    // TODO: make the file naming dynamic based on hostnames
     this.screenshotsFolder = process.cwd() + '/screenshots';
     const todaysDate = new Date().toISOString().split('T')[0];
     this.todaysScreenshotFolder = this.screenshotsFolder + '/' + todaysDate;
@@ -113,6 +112,17 @@ export class SSDiff {
     this.log('Page closed');
     return screenshot;
   }
+  /**
+   * Returns the pixel difference number for two images and creates a difference image
+   *
+   * @remarks
+   * This is the main method for comparision of screenshots for a pathname on two domains.
+   *
+   * @param url1 - url of domain1 + pathnmae
+   * @param url2 - url of domain2 + pathname
+   * @param fileName - filename determined by getFileName method
+   * @returns Pixel difference number for two images and creates a difference image
+   */
   async compare(compareObj: { url1: any; url2: any; fileName: any }) {
     const { url1, url2, fileName } = compareObj;
     const screenshots = await Promise.all([this.screenshot(url1), this.screenshot(url2)]);
@@ -127,7 +137,7 @@ export class SSDiff {
       threshold: 0.7,
       includeAA: true,
     });
-    const totalPixels = image1.data.length / 4;
+    const totalPixels = image1.data.length / 4; // suggested by co-pilot and works
     const differencePercentage = (numDiffPixels / totalPixels) * 100;
     this.log(
       `file name: ${fileName} | numDiffPixels: ${numDiffPixels} | height: ${height} | width: ${width} | totalPixels: ${totalPixels} | percentage: ${
@@ -141,6 +151,14 @@ export class SSDiff {
     const sortedMap = new Map([...this.fileNameDifferenceMap.entries()].sort((a, b) => b[1] - a[1]));
     return sortedMap;
   }
+  /**
+   * Returns the sorted result map with fileName and pixel difference percentage
+   *
+   * @remarks
+   * This is the main method called to use the tool
+   *
+   * @returns Map<fileName, percentageDifference>
+   */
   async result() {
     await this.puppeteer_browser_open();
     this.log('Browser opened');
@@ -156,7 +174,7 @@ export class SSDiff {
     await this.puppeteer_browser_close();
     const resultMap = await this.sortFilesBasedOnDifference();
     this.log('Browser closed');
-    // Output resultMap in output file if configured
+    // Output resultMap in output file only if configured
     if(this.outputFile)
       infoLogger.info(resultMap)
     return resultMap;
