@@ -1,7 +1,7 @@
 {
   "name": "ssdiff",
-  "version": "1.0.4",
-  "description": "",
+  "version": "1.0.5",
+  "description": "A flexible, configurable and open-source testing tool for pixel-perfect website migrations by screenshot diffing.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -22,7 +22,10 @@
   ],
   "keywords": [
     "Screenshot diffing",
-    "Web testing"
+    "Web testing",
+    "Screenshot",
+    "Diffing",
+    "frontend migrations"
   ],
   "author": "Akshat Garg",
   "license": "ISC",
@@ -31,7 +34,7 @@
     "pixelmatch": "^5.3.0",
     "pngjs": "^6.0.0",
     "puppeteer": "^19.6.3",
-    "sharp": "0.31.1"
+    "sharp": "0.31.1" 
   },
   "devDependencies": {
     "@types/pixelmatch": "^5.2.4",

@@ -10,6 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ssdiff": "^1.0.4"
+    "ssdiff": "^1.0.5"
   }
 }
