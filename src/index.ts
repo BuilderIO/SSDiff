@@ -33,6 +33,7 @@ export interface SSDiffConfig {
   pathnames: string[]; // array of pathnames to be compared
   browserConfig?: BrowserConfig; // config passed to puppeteer.launch
   screenshotConfig?: ScreenshotConfig; // config passed to page.screenshot
+  failInCaseOfDifferentSize?: boolean; // if true, the comparison will fail if the images are of different sizes 
   debug?: boolean; // if true, debug logs will be printed
   outputFile?: boolean; // if true, output logs will be printed
 }
@@ -42,6 +43,7 @@ export class SSDiff {
   url2: any;
   pathnames: any;
   browser: any;
+  failInCaseOfDifferentSize: boolean;
   debug: boolean;
   outputFile: boolean;
   browserConfig: BrowserConfig;
@@ -64,6 +66,7 @@ export class SSDiff {
     this.url1 = config.url1;
     this.url2 = config.url2;
     this.pathnames = config.pathnames;
+    this.failInCaseOfDifferentSize = config.failInCaseOfDifferentSize ?? false;
     this.debug = config.debug ?? false;
     this.outputFile = config.outputFile ?? false;
     this.browserConfig = config.browserConfig ?? defaultBrowserConfig;
@@ -172,6 +175,9 @@ export class SSDiff {
       const maxHeight = Math.max(image1.height, image2.height);
       const maxWidth = Math.max(image1.width, image2.width);
       if(image1.height !== image2.height || image1.width !== image2.width) {
+        if(this.failInCaseOfDifferentSize){
+          throw new Error(`Images are of different sizes for ${fileName}...`)
+        }
         // images needs to be resized before comparision
         this.log(`Resizing images for ${fileName}...`)
         image1 = await this.resizeImage(image1, maxWidth, maxHeight);
@@ -222,7 +228,7 @@ export class SSDiff {
         };
       });
       const promises = urls.map((compareObj: any) => this.compare(compareObj));
-      await Promise.all(promises);
+      await Promise.allSettled(promises);
       await this.puppeteer_browser_close();
       const resultMap = await this.sortFilesBasedOnDifference();
       this.log('Browser closed');
