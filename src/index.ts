@@ -24,7 +24,7 @@ export interface BrowserConfig {
   defaultViewport: { width: number; height: number };
 }
 export interface ScreenshotConfig {
-  type?: 'png' // add support of other types
+  type?: 'png'; // add support of other types
   fullPage?: boolean;
 }
 export interface SSDiffConfig {
@@ -33,7 +33,7 @@ export interface SSDiffConfig {
   pathnames: string[]; // array of pathnames to be compared
   browserConfig?: BrowserConfig; // config passed to puppeteer.launch
   screenshotConfig?: ScreenshotConfig; // config passed to page.screenshot
-  failInCaseOfDifferentSize?: boolean; // if true, the comparison will fail if the images are of different sizes 
+  failInCaseOfDifferentSize?: boolean; // if true, the comparison will fail if the images are of different sizes
   debug?: boolean; // if true, debug logs will be printed
   outputFile?: boolean; // if true, output logs will be printed
 }
@@ -123,15 +123,20 @@ export class SSDiff {
    * @returns Resized PNG image with the given width and height parameters
    */
   async resizeImage(image: PNG, width: number, height: number) {
-    try{
+    try {
       const sharpImage = sharp(image.data, { raw: { width: image.width, height: image.height, channels: 4 } });
       // make the resizing configurable if required in future
-      const resizedImageBuffer = await sharpImage.resize({
-        height, width, fit:'contain', position:'left top'
-      }).toFormat('png').toBuffer()
-      return PNG.sync.read(resizedImageBuffer)
-    }
-    catch(e: any){
+      const resizedImageBuffer = await sharpImage
+        .resize({
+          height,
+          width,
+          fit: 'contain',
+          position: 'left top',
+        })
+        .toFormat('png')
+        .toBuffer();
+      return PNG.sync.read(resizedImageBuffer);
+    } catch (e: any) {
       throw new Error('Error while resizing image: ' + e.message);
     }
   }
@@ -174,25 +179,25 @@ export class SSDiff {
       let image2 = PNG.sync.read(screenshots[1]);
       const maxHeight = Math.max(image1.height, image2.height);
       const maxWidth = Math.max(image1.width, image2.width);
-      if(image1.height !== image2.height || image1.width !== image2.width) {
-        if(this.failInCaseOfDifferentSize){
-          this.log(`Failed due to different sized image for pathname : /${fileName}`)
-          throw new Error(`Images are of different sizes for pathname : /${fileName}`)
+      if (image1.height !== image2.height || image1.width !== image2.width) {
+        if (this.failInCaseOfDifferentSize) {
+          this.log(`Failed due to different sized image for pathname : /${fileName}`);
+          throw new Error(`Images are of different sizes for pathname : /${fileName}`);
         }
         // images needs to be resized before comparision
-        this.log(`Resizing images for pathname : /${fileName}`)
+        this.log(`Resizing images for pathname : /${fileName}`);
         image1 = await this.resizeImage(image1, maxWidth, maxHeight);
         image2 = await this.resizeImage(image2, maxWidth, maxHeight);
-        this.log(`Resized images for ${fileName}...`)
+        this.log(`Resized images for ${fileName}...`);
       }
       const diff = new PNG({ width: maxWidth, height: maxHeight });
       const numDiffPixels = pixelmatch(image1.data, image2.data, diff.data, maxWidth, maxHeight, {
         threshold: 0.7,
         includeAA: true,
-        diffColor:[255, 0, 0],
-        diffColorAlt:[0, 0, 255]
+        diffColor: [255, 0, 0],
+        diffColorAlt: [0, 0, 255],
       });
-      const totalPixels = diff.data.length / 4
+      const totalPixels = diff.data.length / 4;
       const differencePercentage = (numDiffPixels / totalPixels) * 100;
       this.log(
         `file name: ${fileName} | numDiffPixels: ${numDiffPixels} | height: ${maxHeight} | width: ${maxWidth} | totalPixels: ${totalPixels} | percentage: ${
@@ -231,11 +236,11 @@ export class SSDiff {
       const promises = urls.map((compareObj: any) => this.compare(compareObj));
       const results = await Promise.allSettled(promises);
       results.forEach((result) => {
-        if(result.status === 'rejected') {
+        if (result.status === 'rejected') {
           // this will still continue to run for other pathnames, but will throw the error for specific pathname
-          throw new Error(result.reason.message)
+          throw new Error(result.reason.message);
         }
-      })
+      });
 
       await this.puppeteer_browser_close();
       const resultMap = await this.sortFilesBasedOnDifference();

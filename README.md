@@ -4,6 +4,7 @@
 ### Features
 <ul>
    <li> Outputs a folder showing visual differences comparing images </li>
+   <li>Out of the box feature to compare different sized screenshots by resizing them</li>
    <li> Debug logging and output logging can be enabled by config </li>
    <li> Configurable for multiple use cases </li>
    <li> Helps in determining the most different pathnames by providing a sorted result map as output</li>
@@ -29,6 +30,7 @@ npm install ssdiff
       pathnames: string[]; // array of pathnames to be compared
       browserConfig?: BrowserConfig; // config passed to puppeteer.launch
       screenshotConfig?: ScreenshotConfig; // config passed to page.screenshot
+      failInCaseOfDifferentSize?: boolean; // if true, the comparison will fail if the images are of different sizes
       debug?: boolean; // if true, debug logs will be printed
       outputFile?: boolean; // if true, output logs will be printed
     }
@@ -38,7 +40,11 @@ npm install ssdiff
 ### Dependencies
 1. The tool uses [puppeteer](https://github.com/puppeteer/puppeteer/tree/main) to open browser in headless mode visit pages and take screenshots. 
 2. It uses [pixelmatch](https://github.com/mapbox/pixelmatch) to compare the screenshots and return a result map.
+3. It uses [sharp](https://www.npmjs.com/package/sharp) to resize the screenshots, in case they are of different sizes.
+
+### Basic architecture of the tool
 ![ScreenshotDiffingTool](https://user-images.githubusercontent.com/60404253/222953921-3d7a701d-a857-459e-9aca-5d42a9f514ad.png)
+
 
 ### Local setup
 1. Clone the repo
