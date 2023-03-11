@@ -176,10 +176,11 @@ export class SSDiff {
       const maxWidth = Math.max(image1.width, image2.width);
       if(image1.height !== image2.height || image1.width !== image2.width) {
         if(this.failInCaseOfDifferentSize){
-          throw new Error(`Images are of different sizes for ${fileName}...`)
+          this.log(`Failed due to different sized image for pathname : /${fileName}`)
+          throw new Error(`Images are of different sizes for pathname : /${fileName}`)
         }
         // images needs to be resized before comparision
-        this.log(`Resizing images for ${fileName}...`)
+        this.log(`Resizing images for pathname : /${fileName}`)
         image1 = await this.resizeImage(image1, maxWidth, maxHeight);
         image2 = await this.resizeImage(image2, maxWidth, maxHeight);
         this.log(`Resized images for ${fileName}...`)
@@ -228,7 +229,14 @@ export class SSDiff {
         };
       });
       const promises = urls.map((compareObj: any) => this.compare(compareObj));
-      await Promise.allSettled(promises);
+      const results = await Promise.allSettled(promises);
+      results.forEach((result) => {
+        if(result.status === 'rejected') {
+          // this will still continue to run for other pathnames, but will throw the error for specific pathname
+          throw new Error(result.reason.message)
+        }
+      })
+
       await this.puppeteer_browser_close();
       const resultMap = await this.sortFilesBasedOnDifference();
       this.log('Browser closed');
