@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer';
 import pixelmatch from 'pixelmatch';
+import sharp from 'sharp';
 import log4js from 'log4js';
 import fs from 'fs';
 import { PNG } from 'pngjs';
@@ -23,7 +24,7 @@ export interface BrowserConfig {
   defaultViewport: { width: number; height: number };
 }
 export interface ScreenshotConfig {
-  type: 'png' | 'jpeg' | 'webp';
+  type?: 'png' // add support of other types
   fullPage?: boolean;
 }
 export interface SSDiffConfig {
@@ -110,6 +111,20 @@ export class SSDiff {
       throw new Error('Error while getting file name: ' + e.message);
     }
   }
+  
+  async resizeImage(image: PNG, width: number, height: number) {
+    try{
+      const sharpImage = sharp(image.data, { raw: { width: image.width, height: image.height, channels: 4 } });
+      const resizedImageBuffer = await sharpImage.resize({
+        height, width, fit:'contain', position:'left top'
+      }).toFormat('png').toBuffer()
+      return PNG.sync.read(resizedImageBuffer)
+    }
+    catch(e: any){
+      throw new Error('Error while resizing image: ' + e.message);
+    }
+  }
+
   async screenshot(url: any) {
     try {
       const page = await this.browser.newPage();
@@ -144,20 +159,28 @@ export class SSDiff {
       const { url1, url2, fileName } = compareObj;
       const screenshots = await Promise.all([this.screenshot(url1), this.screenshot(url2)]);
       // TODO: Make the file name dynamic based on the fileType in screenshotConfig
-      const image1 = PNG.sync.read(screenshots[0]);
-      const image2 = PNG.sync.read(screenshots[1]);
-      const { height, width } = image1;
-      const diff = new PNG({ width, height });
-
-      // Sort the files based on the most different, based on the number of pixels and total pixels
-      const numDiffPixels = pixelmatch(image1.data, image2.data, diff.data, width, height, {
+      let image1 = PNG.sync.read(screenshots[0]);
+      let image2 = PNG.sync.read(screenshots[1]);
+      const maxHeight = Math.max(image1.height, image2.height);
+      const maxWidth = Math.max(image1.width, image2.width);
+      if(image1.height !== image2.height || image1.width !== image2.width) {
+        // images needs to be resized before comparision
+        this.log(`Resizing images for ${fileName}...`)
+        image1 = await this.resizeImage(image1, maxWidth, maxHeight);
+        image2 = await this.resizeImage(image2, maxWidth, maxHeight);
+        this.log(`Resized images for ${fileName}...`)
+      }
+      const diff = new PNG({ width: maxWidth, height: maxHeight });
+      const numDiffPixels = pixelmatch(image1.data, image2.data, diff.data, maxWidth, maxHeight, {
         threshold: 0.7,
         includeAA: true,
+        diffColor:[255, 0, 0],
+        diffColorAlt:[0, 0, 255]
       });
-      const totalPixels = image1.data.length / 4; // suggested by co-pilot and works
+      const totalPixels = diff.data.length / 4
       const differencePercentage = (numDiffPixels / totalPixels) * 100;
       this.log(
-        `file name: ${fileName} | numDiffPixels: ${numDiffPixels} | height: ${height} | width: ${width} | totalPixels: ${totalPixels} | percentage: ${
+        `file name: ${fileName} | numDiffPixels: ${numDiffPixels} | height: ${maxHeight} | width: ${maxWidth} | totalPixels: ${totalPixels} | percentage: ${
           (numDiffPixels / totalPixels) * 100
         }}`,
       );
