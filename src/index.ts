@@ -111,10 +111,18 @@ export class SSDiff {
       throw new Error('Error while getting file name: ' + e.message);
     }
   }
-  
+  /**
+   * @remarks
+   * This method is internally used to resize the image to the same size, incase the images are of different sizes.
+   * @param image - PNG image
+   * @param width - width to be resized to
+   * @param height - height to be resized to
+   * @returns Resized PNG image with the given width and height parameters
+   */
   async resizeImage(image: PNG, width: number, height: number) {
     try{
       const sharpImage = sharp(image.data, { raw: { width: image.width, height: image.height, channels: 4 } });
+      // make the resizing configurable if required in future
       const resizedImageBuffer = await sharpImage.resize({
         height, width, fit:'contain', position:'left top'
       }).toFormat('png').toBuffer()
