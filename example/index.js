@@ -25,8 +25,8 @@ const getLinks = (links, result) => {
 }
 
 const helper = async () => {
-    // const pathnames = getLinks(Links, []).slice(0, 20)
-    const pathnames = ['/c/docs/quickstart', '/c/docs/models-intro']
+    const pathnames = getLinks(Links, []).slice(160, 180)
+    // const pathnames = ['/c/docs/quickstart', '/c/docs/models-intro']
     const ssDiff = new SSDiff({
        url1: localhost,
        url2: production,
