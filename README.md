@@ -42,10 +42,6 @@ npm install ssdiff
 2. It uses [pixelmatch](https://github.com/mapbox/pixelmatch) to compare the screenshots and return a result map.
 3. It uses [sharp](https://www.npmjs.com/package/sharp) to resize the screenshots, in case they are of different sizes.
 
-### Basic architecture of the tool
-![ScreenshotDiffingTool](https://user-images.githubusercontent.com/60404253/222953921-3d7a701d-a857-459e-9aca-5d42a9f514ad.png)
-
-
 ### Local setup
 1. Clone the repo
 2. ```npm install```
@@ -63,3 +59,13 @@ npm install ssdiff
 ### Example usage
 
 An example can be found [here](https://github.com/akshatgarg12/SSDiff/tree/main/example)
+
+
+### Example Flow
+![Flow](./docs/images/flow.png)
+
+### Basic architecture of the tool
+![Architecture](./docs/images/system-architecture.png)
+
+### Concept of Diffing
+![Diff](./docs/images/diff.png)
