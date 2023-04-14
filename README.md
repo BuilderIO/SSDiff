@@ -1,7 +1,7 @@
 <h2 align="center">SSDiff</h2>
 <h4 align="center">The open-source tool for pixel-perfect website migrations<h4>
 
-![Diff](./docs/images/diff.png)
+![Diff](./docs/images/hero.png)
 
 ### Features
 <ul>
