@@ -1,6 +1,8 @@
 <h2 align="center">SSDiff</h2>
 <h4 align="center">The open-source tool for pixel-perfect website migrations<h4>
 
+![Diff](./docs/images/diff.png)
+
 ### Features
 <ul>
    <li> Outputs a folder showing visual differences comparing images </li>
@@ -67,5 +69,3 @@ An example can be found [here](https://github.com/akshatgarg12/SSDiff/tree/main/
 ### Basic architecture of the tool
 ![Architecture](./docs/images/system-architecture.png)
 
-### Concept of Diffing
-![Diff](./docs/images/diff.png)
