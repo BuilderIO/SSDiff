@@ -1,6 +1,6 @@
 {
   "name": "ssdiff",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A flexible, configurable and open-source testing tool for pixel-perfect website migrations by screenshot diffing.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

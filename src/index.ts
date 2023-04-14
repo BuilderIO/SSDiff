@@ -196,7 +196,7 @@ export class SSDiff {
         threshold: 0.1,
         includeAA: true,
         diffColor: [253, 225, 225],
-        diffColorAlt:[212, 143, 143],
+        diffColorAlt: [212, 143, 143],
       });
       const totalPixels = diff.data.length / 4;
       const differencePercentage = (numDiffPixels / totalPixels) * 100;
