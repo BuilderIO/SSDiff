@@ -109,6 +109,7 @@ export class SSDiff {
   getFileName(url: string) {
     try {
       const parsedURL = new URL(url);
+      // TODO: Make this generic
       return parsedURL.pathname.split('/')[3];
     } catch (e: any) {
       throw new Error('Error while getting file name: ' + e.message);
@@ -192,10 +193,10 @@ export class SSDiff {
       }
       const diff = new PNG({ width: maxWidth, height: maxHeight });
       const numDiffPixels = pixelmatch(image1.data, image2.data, diff.data, maxWidth, maxHeight, {
-        threshold: 0.7,
+        threshold: 0.1,
         includeAA: true,
-        diffColor: [255, 0, 0],
-        diffColorAlt: [0, 0, 255],
+        diffColor: [253, 225, 225],
+        diffColorAlt:[212, 143, 143],
       });
       const totalPixels = diff.data.length / 4;
       const differencePercentage = (numDiffPixels / totalPixels) * 100;

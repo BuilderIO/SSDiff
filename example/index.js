@@ -1,8 +1,9 @@
 const Links = require('./links.json')
 const {SSDiff} = require('ssdiff')
-const localhost = 'http://site-qwik.vercel.app'
-// const localhost = 'http://localhost:5173'
-const production = 'https://www.builder.io'
+// const localhost = 'http://site-qwik.vercel.app'
+const localhost = 'http://localhost:5173'
+// const production = 'https://www.builder.io'
+const production = 'http://localhost:3000'
 
 // Function to filter links from an external source
 const getLinks = (links, result) => {
@@ -25,7 +26,8 @@ const getLinks = (links, result) => {
 }
 
 const helper = async () => {
-    const pathnames = getLinks(Links, []).slice(160, 180)
+    // const pathnames = getLinks(Links, []).slice(160, 180)
+    const pathnames = ['/square']
     // const pathnames = ['/c/docs/quickstart', '/c/docs/models-intro']
     const ssDiff = new SSDiff({
        url1: localhost,
