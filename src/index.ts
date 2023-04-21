@@ -109,7 +109,7 @@ export class SSDiff {
   getFileName(url: string) {
     try {
       const parsedURL = new URL(url);
-      return parsedURL.pathname.split('/')[3];
+      return parsedURL.pathname.substring(1).replaceAll('/', '-');
     } catch (e: any) {
       throw new Error('Error while getting file name: ' + e.message);
     }
