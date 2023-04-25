@@ -36,6 +36,7 @@ export interface SSDiffConfig {
   failInCaseOfDifferentSize?: boolean; // if true, the comparison will fail if the images are of different sizes
   debug?: boolean; // if true, debug logs will be printed
   outputFile?: boolean; // if true, output logs will be printed
+  waitUntil?: string; // when the screenshot should be taken in regards to the loaded state of the page, defaults to networkidle0
 }
 
 export class SSDiff {
@@ -52,6 +53,7 @@ export class SSDiff {
   todaysScreenshotFolder: string; // screenshots folder for the current date
   diffScreenshots: string; // diff screenshots folder for the current date (this still remians, because we might store ss of domains separately)
   fileNameDifferenceMap: Map<string, number> = new Map(); // result of the comparison
+  waitUntil: string;
 
   constructor(config: SSDiffConfig) {
     const defaultScreenshotConfig: ScreenshotConfig = {
@@ -80,6 +82,7 @@ export class SSDiff {
       fs.mkdirSync(this.diffScreenshots, { recursive: true });
       this.log('Created diff folder for todays ss');
     }
+    this.waitUntil = config.waitUntil ?? 'networkidle0'
   }
   log(text: string) {
     if (this.debug) {
@@ -147,7 +150,7 @@ export class SSDiff {
       const page = await this.browser.newPage();
       this.log('New Page in browser opened');
       await page.goto(url, {
-        waitUntil: 'networkidle0',
+        waitUntil: this.waitUntil,
         timeout: 0,
       });
       this.log(`URL opened on page ${url}`);

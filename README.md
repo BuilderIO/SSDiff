@@ -35,6 +35,7 @@ npm install ssdiff
       failInCaseOfDifferentSize?: boolean; // if true, the comparison will fail if the images are of different sizes
       debug?: boolean; // if true, debug logs will be printed
       outputFile?: boolean; // if true, output logs will be printed
+      waitUntil?: string; // when the screenshot should be taken in regards to the loaded state of the page, defaults to networkidle0
     }
 
 ```
