@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+import puppeteer, { PuppeteerLifeCycleEvent } from 'puppeteer';
 import pixelmatch from 'pixelmatch';
 import sharp from 'sharp';
 import log4js from 'log4js';
@@ -28,7 +28,7 @@ export interface ScreenshotConfig {
   fullPage?: boolean;
 }
 export interface PageConfig {
-  waitUntil?: string; // when the screenshot should be taken in regards to the loaded state of the page, defaults to networkidle0
+  waitUntil?: PuppeteerLifeCycleEvent; // when the screenshot should be taken in regards to the loaded state of the page, defaults to networkidle0
   timeout?: number;
 }
 export interface SSDiffConfig {
