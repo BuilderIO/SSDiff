@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+import puppeteer, { PuppeteerLifeCycleEvent } from 'puppeteer';
 import pixelmatch from 'pixelmatch';
 import sharp from 'sharp';
 import log4js from 'log4js';
@@ -27,12 +27,17 @@ export interface ScreenshotConfig {
   type?: 'png'; // add support of other types
   fullPage?: boolean;
 }
+export interface PageConfig {
+  waitUntil?: PuppeteerLifeCycleEvent; // when the screenshot should be taken in regards to the loaded state of the page, defaults to networkidle0
+  timeout?: number;
+}
 export interface SSDiffConfig {
   url1: string; // url of domain1
   url2: string; // url of domain2
   pathnames: string[]; // array of pathnames to be compared
   browserConfig?: BrowserConfig; // config passed to puppeteer.launch
   screenshotConfig?: ScreenshotConfig; // config passed to page.screenshot
+  pageConfig?: PageConfig; // config passed to page.goto
   failInCaseOfDifferentSize?: boolean; // if true, the comparison will fail if the images are of different sizes
   debug?: boolean; // if true, debug logs will be printed
   outputFile?: boolean; // if true, output logs will be printed
@@ -48,6 +53,7 @@ export class SSDiff {
   outputFile: boolean;
   browserConfig: BrowserConfig;
   screenshotConfig: ScreenshotConfig;
+  pageConfig: PageConfig;
   screenshotsFolder: string; // screenshots folder in the root of the project
   todaysScreenshotFolder: string; // screenshots folder for the current date
   diffScreenshots: string; // diff screenshots folder for the current date (this still remians, because we might store ss of domains separately)
@@ -63,6 +69,10 @@ export class SSDiff {
         height: 1280,
       },
     };
+    const defaultPageConfig: PageConfig = {
+      waitUntil: 'networkidle0',
+      timeout: 0,
+    };
     this.url1 = config.url1;
     this.url2 = config.url2;
     this.pathnames = config.pathnames;
@@ -71,6 +81,7 @@ export class SSDiff {
     this.outputFile = config.outputFile ?? false;
     this.browserConfig = config.browserConfig ?? defaultBrowserConfig;
     this.screenshotConfig = config.screenshotConfig ?? defaultScreenshotConfig;
+    this.pageConfig = config.pageConfig ?? defaultPageConfig;
     this.browser = null;
     this.screenshotsFolder = process.cwd() + '/screenshots';
     const todaysDate = new Date().toISOString().split('T')[0];
@@ -146,10 +157,7 @@ export class SSDiff {
     try {
       const page = await this.browser.newPage();
       this.log('New Page in browser opened');
-      await page.goto(url, {
-        waitUntil: 'networkidle0',
-        timeout: 0,
-      });
+      await page.goto(url, this.pageConfig);
       this.log(`URL opened on page ${url}`);
       // fileLocation ->  localhost_developers
       const screenshot = await page.screenshot(this.screenshotConfig);

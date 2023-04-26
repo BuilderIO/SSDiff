@@ -32,6 +32,7 @@ npm install ssdiff
       pathnames: string[]; // array of pathnames to be compared
       browserConfig?: BrowserConfig; // config passed to puppeteer.launch
       screenshotConfig?: ScreenshotConfig; // config passed to page.screenshot
+      pageConfig?: PageConfig; // config passed to page.goto
       failInCaseOfDifferentSize?: boolean; // if true, the comparison will fail if the images are of different sizes
       debug?: boolean; // if true, debug logs will be printed
       outputFile?: boolean; // if true, output logs will be printed
