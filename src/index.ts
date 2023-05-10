@@ -120,8 +120,8 @@ export class SSDiff {
   getFileName(url: string) {
     try {
       const parsedURL = new URL(url);
-      // TODO: Make this generic
-      return parsedURL.pathname.split('/')[3];
+      const fileName = parsedURL.pathname.substring(1).replaceAll('/', '-');
+      return fileName.at(-1) === '-' ? fileName.substring(0, fileName.length - 1) : fileName;
     } catch (e: any) {
       throw new Error('Error while getting file name: ' + e.message);
     }

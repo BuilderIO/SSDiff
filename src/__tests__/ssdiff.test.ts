@@ -42,8 +42,8 @@ describe('SSDiff method testing', () => {
   });
 
   test('test getFileName method', () => {
-    expect(ssdiff.getFileName('http://site-qwik.vercel.app/c/docs/developers/')).toBe('developers');
-    expect(ssdiff.getFileName('https://www.builder.io/c/docs/quickstart')).toBe('quickstart');
+    expect(ssdiff.getFileName('http://site-qwik.vercel.app/c/docs/developers/')).toBe('c-docs-developers');
+    expect(ssdiff.getFileName('https://www.builder.io/c/docs/quickstart')).toBe('c-docs-quickstart');
   });
 
   test('test screenshot method', async () => {
