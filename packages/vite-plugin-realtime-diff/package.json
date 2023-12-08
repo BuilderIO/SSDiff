@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-realtime-diff",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Compare two websites and see the difference directly in your browser realtime.",
   "main": "dist/index.js",
   "scripts": {
