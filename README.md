@@ -50,7 +50,7 @@ import { realtimeDiff } from 'vite-plugin-realtime-diff'
 
 export  default  defineConfig(() => {
 	return {
-		plugins: [realtimeDiff('http://localhost:5173/*', 'http://localhost:3000/*')],
+		plugins: [realtimeDiff('https://builder.io/')],
 	}
 })
 ```
