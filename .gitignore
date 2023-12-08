@@ -1,6 +1,1 @@
-node_modules/
-screenshots/
-links.json
-dist/
-*.log
-coverage/
+node_modules
