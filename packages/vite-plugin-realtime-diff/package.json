@@ -1,8 +1,8 @@
 {
   "name": "vite-plugin-realtime-diff",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Compare two websites and see the difference directly in your browser realtime.",
-  "main": "dist/index.js",
+  "main": "index.js",
   "scripts": {
     "build": "esbuild src/index.ts --bundle --platform=node --outdir=dist",
     "build:prod": "esbuild src/index.ts --bundle --platform=node --outdir=dist --minify --sourcemap",
