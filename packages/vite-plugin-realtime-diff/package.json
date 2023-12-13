@@ -1,12 +1,13 @@
 {
   "name": "vite-plugin-realtime-diff",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Compare two websites and see the difference directly in your browser realtime.",
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --platform=node --outdir=dist",
-    "build:prod": "esbuild src/index.ts --bundle --platform=node --outdir=dist --minify --sourcemap",
-    "dev": "esbuild src/index.ts --bundle --platform=node --outdir=dist --watch",
+    "build": "tsc --emitDeclarationOnly && esbuild src/index.ts --bundle --platform=node --outdir=dist",
+    "build:prod": "yarn build --minify --sourcemap",
+    "dev": "yarn build --watch",
     "lint": "eslint --ext .ts src",
     "lint:fix": "eslint --ext .ts src --fix",
     "fmt": "prettier --write \"src/**/*.ts\"",
