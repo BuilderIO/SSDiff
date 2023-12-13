@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-realtime-diff",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Compare two websites and see the difference directly in your browser realtime.",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "fmt": "prettier --write \"src/**/*.ts\"",
     "fmt:check": "prettier --check \"src/**/*.ts\"",
     "test": "vitest run",
-    "deploy": "npm run build:prod && cp package.json dist && cd dist && npm publish --access public && cd .."
+    "deploy": "npm run build:prod && cp package.json dist && cp README.md dist && cd dist && npm publish --access public && cd .."
   },
   "keywords": [
     "vite",

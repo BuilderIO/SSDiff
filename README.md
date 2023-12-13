@@ -37,10 +37,10 @@ npm install ssdiff
 ```
 
 #### Vite plugin
-If you want to do the visual testing yourself on your browser by just adding `?diff=true` command, use our vite plugin. This will show you the output directly and compare it with two base URLs that you provide.
+If you want to do the visual testing yourself on your browser by just adding `?_diff=true` command, use our vite plugin. This will show you the output directly and compare it with two base URLs that you provide.
 
 ```
-npm install vite-plugin-realtime-diff
+npm install -D vite-plugin-realtime-diff
 ```
 
 
