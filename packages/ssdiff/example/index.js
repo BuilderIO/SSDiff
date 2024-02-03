@@ -1,6 +1,6 @@
-const { SSDiff } = require('ssdiff');
-const localhost = 'http://site-qwik.vercel.app';
-const production = 'https://www.builder.io';
+const { SSDiff } = require("ssdiff");
+const localhost = "http://site-qwik.vercel.app";
+const production = "https://www.builder.io";
 
 // Function to filter links from an external source
 const getLinks = (links, result) => {
@@ -9,7 +9,7 @@ const getLinks = (links, result) => {
       getLinks(link.subLinks, result);
     } else {
       // only take the links that are in the docs
-      if (link.link.indexOf('/c/docs') !== -1) {
+      if (link.link.indexOf("/c/docs") !== -1) {
         try {
           const url = new URL(link.link);
           result.push(url.pathname);
@@ -23,12 +23,12 @@ const getLinks = (links, result) => {
 };
 
 const helper = async () => {
-  const pathnames = ['/c/docs/developers'];
+  const pathnames = ["/c/docs/developers"];
   const ssDiff = new SSDiff({
     url1: localhost,
     url2: production,
     pageConfig: {
-      waitUntil: 'domcontentloaded',
+      waitUntil: "domcontentloaded",
       timeout: 0,
     },
     pathnames,

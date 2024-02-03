@@ -1,30 +1,30 @@
-import puppeteer, { PuppeteerLifeCycleEvent } from 'puppeteer';
-import pixelmatch from 'pixelmatch';
-import sharp from 'sharp';
-import log4js from 'log4js';
-import fs from 'fs';
-import { PNG } from 'pngjs';
-import { URL } from 'url';
+import puppeteer, { PuppeteerLifeCycleEvent } from "puppeteer";
+import pixelmatch from "pixelmatch";
+import sharp from "sharp";
+import log4js from "log4js";
+import fs from "fs";
+import { PNG } from "pngjs";
+import { URL } from "url";
 
 log4js.configure({
   appenders: {
-    debug: { type: 'file', filename: 'ssdiff-debug.log' },
-    out: { type: 'file', filename: 'ssdiff-output.log' },
+    debug: { type: "file", filename: "ssdiff-debug.log" },
+    out: { type: "file", filename: "ssdiff-output.log" },
   },
   categories: {
-    default: { appenders: ['debug'], level: 'debug' },
-    output: { appenders: ['out'], level: 'info' },
+    default: { appenders: ["debug"], level: "debug" },
+    output: { appenders: ["out"], level: "info" },
   },
 });
 
 const debugLogger = log4js.getLogger();
-const infoLogger = log4js.getLogger('output');
+const infoLogger = log4js.getLogger("output");
 
 export interface BrowserConfig {
   defaultViewport: { width: number; height: number };
 }
 export interface ScreenshotConfig {
-  type?: 'png'; // add support of other types
+  type?: "png"; // add support of other types
   fullPage?: boolean;
 }
 export interface PageConfig {
@@ -61,7 +61,7 @@ export class SSDiff {
 
   constructor(config: SSDiffConfig) {
     const defaultScreenshotConfig: ScreenshotConfig = {
-      type: 'png',
+      type: "png",
     };
     const defaultBrowserConfig: BrowserConfig = {
       defaultViewport: {
@@ -70,7 +70,7 @@ export class SSDiff {
       },
     };
     const defaultPageConfig: PageConfig = {
-      waitUntil: 'networkidle0',
+      waitUntil: "networkidle0",
       timeout: 0,
     };
     this.url1 = config.url1;
@@ -83,13 +83,13 @@ export class SSDiff {
     this.screenshotConfig = config.screenshotConfig ?? defaultScreenshotConfig;
     this.pageConfig = config.pageConfig ?? defaultPageConfig;
     this.browser = null;
-    this.screenshotsFolder = process.cwd() + '/screenshots';
-    const todaysDate = new Date().toISOString().split('T')[0];
-    this.todaysScreenshotFolder = this.screenshotsFolder + '/' + todaysDate;
-    this.diffScreenshots = this.todaysScreenshotFolder + '/diff';
+    this.screenshotsFolder = process.cwd() + "/screenshots";
+    const todaysDate = new Date().toISOString().split("T")[0];
+    this.todaysScreenshotFolder = this.screenshotsFolder + "/" + todaysDate;
+    this.diffScreenshots = this.todaysScreenshotFolder + "/diff";
     if (!fs.existsSync(this.diffScreenshots)) {
       fs.mkdirSync(this.diffScreenshots, { recursive: true });
-      this.log('Created diff folder for todays ss');
+      this.log("Created diff folder for todays ss");
     }
   }
   log(text: string) {
@@ -103,7 +103,7 @@ export class SSDiff {
         this.browser = await puppeteer.launch(this.browserConfig);
       }
     } catch (e: any) {
-      throw new Error('Error while opening browser: ' + e.message);
+      throw new Error("Error while opening browser: " + e.message);
     }
   }
   async puppeteer_browser_close() {
@@ -114,16 +114,16 @@ export class SSDiff {
         this.browser = null;
       }
     } catch (e: any) {
-      throw new Error('Error while closing browser: ' + e.message);
+      throw new Error("Error while closing browser: " + e.message);
     }
   }
   getFileName(url: string) {
     try {
       const parsedURL = new URL(url);
-      const fileName = parsedURL.pathname.substring(1).replaceAll('/', '-');
-      return fileName.at(-1) === '-' ? fileName.substring(0, fileName.length - 1) : fileName;
+      const fileName = parsedURL.pathname.substring(1).replaceAll("/", "-");
+      return fileName.at(-1) === "-" ? fileName.substring(0, fileName.length - 1) : fileName;
     } catch (e: any) {
-      throw new Error('Error while getting file name: ' + e.message);
+      throw new Error("Error while getting file name: " + e.message);
     }
   }
   /**
@@ -142,30 +142,30 @@ export class SSDiff {
         .resize({
           height,
           width,
-          fit: 'contain',
-          position: 'left top',
+          fit: "contain",
+          position: "left top",
         })
-        .toFormat('png')
+        .toFormat("png")
         .toBuffer();
       return PNG.sync.read(resizedImageBuffer);
     } catch (e: any) {
-      throw new Error('Error while resizing image: ' + e.message);
+      throw new Error("Error while resizing image: " + e.message);
     }
   }
 
   async screenshot(url: any) {
     try {
       const page = await this.browser.newPage();
-      this.log('New Page in browser opened');
+      this.log("New Page in browser opened");
       await page.goto(url, this.pageConfig);
       this.log(`URL opened on page ${url}`);
       // fileLocation ->  localhost_developers
       const screenshot = await page.screenshot(this.screenshotConfig);
       await page.close();
-      this.log('Page closed');
+      this.log("Page closed");
       return screenshot;
     } catch (e: any) {
-      throw new Error('Error while taking screenshot: ' + e.message);
+      throw new Error("Error while taking screenshot: " + e.message);
     }
   }
   /**
@@ -216,7 +216,7 @@ export class SSDiff {
       this.fileNameDifferenceMap.set(fileName, differencePercentage); // this map is used to sort the files in the folde
       fs.writeFileSync(this.diffScreenshots + `/${fileName}`, PNG.sync.write(diff));
     } catch (e: any) {
-      throw new Error('Error while comparing screenshots: ' + e.message);
+      throw new Error("Error while comparing screenshots: " + e.message);
     }
   }
   async sortFilesBasedOnDifference() {
@@ -234,7 +234,7 @@ export class SSDiff {
   async result() {
     try {
       await this.puppeteer_browser_open();
-      this.log('Browser opened');
+      this.log("Browser opened");
       const urls = this.pathnames.map((pathname: any) => {
         return {
           url1: this.url1 + pathname,
@@ -245,7 +245,7 @@ export class SSDiff {
       const promises = urls.map((compareObj: any) => this.compare(compareObj));
       const results = await Promise.allSettled(promises);
       results.forEach((result) => {
-        if (result.status === 'rejected') {
+        if (result.status === "rejected") {
           // this will still continue to run for other pathnames, but will throw the error for specific pathname
           throw new Error(result.reason.message);
         }
@@ -253,13 +253,13 @@ export class SSDiff {
 
       await this.puppeteer_browser_close();
       const resultMap = await this.sortFilesBasedOnDifference();
-      this.log('Browser closed');
+      this.log("Browser closed");
       // Output resultMap in output file only if configured
       if (this.outputFile) infoLogger.info(resultMap);
       return resultMap;
     } catch (e: any) {
       this.log(e.message);
-      throw new Error('Error while getting result: ' + e.message);
+      throw new Error("Error while getting result: " + e.message);
     }
   }
 }
